@@ -117,14 +117,51 @@ renv::install("packages/uofgstats")        # install into the project library
 - New dependencies: `renv::install("pkg")`, then `renv::snapshot()` and commit
   `renv.lock`.
 
+## Installing the packages
+
+Clone and build (recommended — runs the full pipeline):
+
+```sh
+git clone https://github.com/WyattAu/uofg_r_mono && cd uofg_r_mono
+Rscript -e 'renv::restore()'
+Rscript scripts/build-all.R
+```
+
+Or install directly from GitHub (install `uofgcore` first — it is not on
+CRAN, so dependency resolution cannot fetch it for you):
+
+```r
+# install.packages("remotes")
+remotes::install_github("WyattAu/uofg_r_mono/packages/uofgcore")
+remotes::install_github("WyattAu/uofg_r_mono/packages/uofgstats")
+```
+
+## Maintenance
+
+The lockfile pins dependency versions and will rot slowly as CRAN moves.
+Once a month (or before important work):
+
+```r
+renv::update()     # move every locked package to its latest allowed version
+Rscript scripts/build-all.R
+Rscript scripts/lint-all.R
+renv::snapshot()   # record the new state, then commit renv.lock
+```
+
+CI also runs on a monthly schedule against the current CRAN/R ecosystem,
+so bitrot is surfaced even when nobody touches the repository.
+
 ## CI
 
-[`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs on every push/PR:
+[`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs on every push/PR
+(and monthly on a schedule):
 
-1. `r-lib/actions/setup-r` with the public RSPM mirror,
+1. `r-lib/actions/setup-r` — matrix over R `release` and `oldrel-1`,
 2. `r-lib/actions/setup-renv` restoring `renv.lock` (with caching),
 3. `Rscript scripts/build-all.R` — documents, tests, `R CMD check --as-cran`, and
    installs every package; the job fails on any error or test failure.
+
+A separate `lint` job runs `scripts/lint-all.R` on `release`.
 
 ## Troubleshooting
 
