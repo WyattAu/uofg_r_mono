@@ -1,0 +1,19 @@
+Package: uofgstats
+Type: Package
+Title: Statistical Utilities for the UofG R Monorepo
+Version: 0.1.0
+Authors@R: person("Wyatt", "Au", , "wyatt_au@protonmail.com", role = c("aut", "cre"))
+Description: Statistical helper functions for the uofg_r_mono monorepo.
+    Depends on the companion package 'uofgcore' to demonstrate how
+    packages inside the monorepo depend on one another.
+License: Apache License (>= 2.0)
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+Imports:
+    uofgcore
+Suggests:
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+URL: https://github.com/WyattAu/uofg_r_mono
+BugReports: https://github.com/WyattAu/uofg_r_mono/issues
+Config/roxygen2/version: 8.1.0
