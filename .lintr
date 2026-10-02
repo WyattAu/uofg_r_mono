@@ -1,5 +1,12 @@
 # Shared lintr configuration for every package in this monorepo.
+#
+# `uofgcore_fibonacci` is a native routine bound into the namespace via
+# `useDynLib(..., .registration = TRUE)` (see packages/uofgcore); static
+# analysis cannot see that binding, so it is exempted explicitly.
 linters: linters_with_defaults(
-    line_length_linter = line_length_linter(100L)
+    line_length_linter = line_length_linter(100L),
+    object_usage_linter = object_usage_linter(
+      exceptions = "uofgcore_fibonacci"
+    )
   )
 encoding: "UTF-8"
