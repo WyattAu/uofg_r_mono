@@ -23,7 +23,8 @@ fibonacci <- function(n) {
     stop("`n` must be a single, non-negative integer.", call. = FALSE)
   }
   if (n > 78) {
-    stop("`n` must be at most 78: larger results are not exactly representable as doubles.", call. = FALSE)
+    stop("`n` must be at most 78: larger results are not exactly ",
+         "representable as doubles.", call. = FALSE)
   }
   .Call(uofgcore_fibonacci, n)
 }

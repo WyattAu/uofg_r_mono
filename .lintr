@@ -1,0 +1,5 @@
+# Shared lintr configuration for every package in this monorepo.
+linters: linters_with_defaults(
+    line_length_linter = line_length_linter(100L)
+  )
+encoding: "UTF-8"

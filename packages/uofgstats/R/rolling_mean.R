@@ -19,8 +19,9 @@
 #' rolling_mean(c(1, 2, 3, 4, 5), 5)
 rolling_mean <- function(x, window) {
   x <- uofgcore::validate_numeric(x)
-  if (!is.numeric(window) || length(window) != 1L || is.na(window) ||
-      window < 1 || window != floor(window)) {
+  is_bad_window <- !is.numeric(window) || length(window) != 1L ||
+    is.na(window) || window < 1 || window != floor(window)
+  if (is_bad_window) {
     stop("`window` must be a single positive integer.", call. = FALSE)
   }
   if (window > length(x)) {

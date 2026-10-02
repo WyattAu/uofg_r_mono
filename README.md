@@ -1,9 +1,29 @@
 # uofg_r_mono
 
+[![CI](https://github.com/WyattAu/uofg_r_mono/actions/workflows/ci.yml/badge.svg)](https://github.com/WyattAu/uofg_r_mono/actions/workflows/ci.yml)
+[![License: Apache-2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+
 An R **monorepo** template: multiple R packages live in one repository, sharing a single
 [`renv`](https://rstudio.github.io/renv/) lockfile, one CI pipeline, and one build script.
 
 - License: [Apache-2.0](LICENSE)
+
+## Using this template
+
+To turn this repository into your own project:
+
+1. **Rename the packages**: copy or rename folders under `packages/`, then
+   update the `Package:` and `Title:` fields in each `DESCRIPTION`, the
+   `useDynLib()`/`@useDynLib` references (only if you keep compiled code),
+   and `library()` calls in `tests/testthat.R`.
+2. **Point the metadata at your repository**: update the `URL:` and
+   `BugReports:` fields in every `DESCRIPTION`.
+3. **Reset the dependency lock** (optional, for a minimal toolchain):
+   delete `renv.lock`, then run `renv::init(bare = TRUE)` and reinstall
+   only the tools you need, e.g. `renv::install(c("devtools", "rcmdcheck"))`,
+   followed by `renv::snapshot()`.
+4. **Update this README** — everything between the badges and the
+   Troubleshooting section describes the template itself.
 
 ## Repository layout
 
