@@ -89,11 +89,11 @@ for (pkg in build_order) {
 
   # 1. Generate NAMESPACE, man/, and the Collate field from roxygen comments.
   message("-- roxygen2: documenting")
-  devtools::document(path, roclets = c("collate", "namespace", "rd"))
+  roxygen2::roxygenise(path, roclets = c("collate", "namespace", "rd"))
 
   # 2. Unit tests.
   message("-- testthat: running tests")
-  devtools::test(path, stop_on_failure = TRUE, stop_on_warning = FALSE)
+  testthat::test_local(path, stop_on_failure = TRUE, stop_on_warning = FALSE)
 
   # 3. Full `R CMD check --as-cran`.
   message("-- R CMD check (as CRAN)")

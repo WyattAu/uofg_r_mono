@@ -81,11 +81,16 @@ Rscript scripts/build-all.R
 Or work on a single package interactively:
 
 ```r
-devtools::document("packages/uofgcore")   # regenerate man/ + NAMESPACE
-devtools::test("packages/uofgcore")       # run testthat suite
-devtools::check("packages/uofgstats")     # R CMD check --as-cran
-renv::install("packages/uofgstats")       # install into the project library
+roxygen2::roxygenise("packages/uofgcore")  # regenerate man/ + NAMESPACE
+testthat::test_local("packages/uofgcore")  # run testthat suite
+rcmdcheck::rcmdcheck("packages/uofgstats") # R CMD check --as-cran
+renv::install("packages/uofgstats")        # install into the project library
 ```
+
+> Prefer the `devtools`/`usethis` interactive toolkit? It is intentionally
+> *not* locked in `renv.lock` (its dependency tree is heavy and drags in
+> system libraries CI does not ship). Install it locally without locking
+> it in: `renv::install("devtools")` — just don't `renv::snapshot()` it.
 
 ## Adding a new package
 
@@ -101,8 +106,8 @@ renv::install("packages/uofgstats")       # install into the project library
 
 ## How renv works in this repo
 
-- `renv.lock` is committed and pins every dependency, including the dev toolchain
-  (`devtools`, `testthat`, `roxygen2`, `rcmdcheck`, `lintr`, `styler`).
+- `renv.lock` is committed and pins every dependency, including the toolchain
+  (`roxygen2`, `testthat`, `rcmdcheck`, `lintr`, `styler`, `covr`).
 - `renv/library/` is machine-local and gitignored; recreate it with `renv::restore()`.
 - The monorepo's own packages are registered as *ignored packages*, so renv never
   tries to install them from CRAN — `scripts/build-all.R` installs them from source.
