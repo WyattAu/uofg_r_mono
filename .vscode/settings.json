@@ -1,0 +1,18 @@
+{
+  // The R language server package (`languageserver`) is locked in renv.lock,
+  // so every contributor gets identical LSP behavior.
+  "r.lsp.multiServer": true,
+
+  // Match the lintr configuration (line_length_linter(100L)).
+  "editor.rulers": [100],
+
+  // Keep diffs clean; EditorConfig enforces the same rules for other editors.
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+
+  // Treat package folders as their own workspaces so the R language server
+  // loads each package's namespace correctly.
+  "r.lsp.diagnostics": true,
+
+  "testExplorer.useNativeTesting": true
+}

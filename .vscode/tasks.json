@@ -1,0 +1,26 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build: document, test, check, install all packages",
+      "type": "shell",
+      "command": "Rscript scripts/build-all.R",
+      "group": { "kind": "build", "isDefault": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "lint: all packages",
+      "type": "shell",
+      "command": "Rscript scripts/lint-all.R",
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "coverage: all packages",
+      "type": "shell",
+      "command": "Rscript scripts/coverage.R",
+      "group": "test",
+      "problemMatcher": []
+    }
+  ]
+}

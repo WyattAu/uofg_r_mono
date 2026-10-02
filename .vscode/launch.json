@@ -1,0 +1,23 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "R-Debugger",
+      "request": "launch",
+      "name": "Run uofgcore tests",
+      "debugMode": "batch",
+      "workingDirectory": "${workspaceFolder}/packages/uofgcore",
+      "command": "testthat::test_local()",
+      "allowGlobalDebugging": false
+    },
+    {
+      "type": "R-Debugger",
+      "request": "launch",
+      "name": "Run uofgstats tests",
+      "debugMode": "batch",
+      "workingDirectory": "${workspaceFolder}/packages/uofgstats",
+      "command": "testthat::test_local()",
+      "allowGlobalDebugging": false
+    }
+  ]
+}

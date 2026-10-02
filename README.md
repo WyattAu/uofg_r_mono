@@ -32,13 +32,23 @@ uofg_r_mono/
 ├── .github/workflows/ci.yml   # CI: restores renv, then builds/checks every package
 ├── .Rprofile                  # activates renv automatically in every R session
 ├── .Renviron                  # machine-local renv overrides (gitignored)
+├── .editorconfig              # shared formatting rules (all editors)
+├── .lintr                     # shared lint policy (100-char lines)
+├── .vscode/                   # R LSP (multi-server), tasks, debug configs
+├── ARCHITECTURE.md            # why the monorepo is shaped this way
+├── CONTRIBUTING.md            # how to contribute
 ├── renv.lock                  # pinned package versions — commit this
 ├── renv/                      # renv internals; renv/library is machine-local
 ├── packages/
 │   ├── uofgcore/              # base package (incl. compiled C code under src/)
+│   │   ├── .Rprofile          # activates the root renv when opened in RStudio
+│   │   └── uofgcore.Rproj     # RStudio project with a wired-up Build tab
 │   └── uofgstats/             # depends on uofgcore (demos internal deps)
+│       └── uofgstats.Rproj
 ├── scripts/
-│   └── build-all.R            # document → test → R CMD check → install, in dep order
+│   ├── build-all.R            # document → test → R CMD check → install, in dep order
+│   ├── lint-all.R             # lintr gate (CI runs this as a separate job)
+│   └── coverage.R             # per-package covr report
 └── README.md
 ```
 
@@ -46,8 +56,13 @@ uofg_r_mono/
 
 | Package      | Description                                                        |
 |--------------|--------------------------------------------------------------------|
-| `uofgcore`   | Shared helpers (`greet()`, `validate_numeric()`) and a compiled C routine (`fibonacci()`) proving the native-code toolchain. |
-| `uofgstats`  | Statistical utilities (`rolling_mean()`); imports `uofgcore` to demonstrate intra-monorepo dependencies. |
+| `uofgcore`   | Shared helpers: `greet()`, `validate_numeric()`, `zscore()`, plus the C-backed `fibonacci()` proving the native-code toolchain. |
+| `uofgstats`  | Statistical utilities: `rolling_mean()`, and the `fit_linreg()` / `tidy_linreg()` pair demonstrating formula interfaces and S3 classes. `Imports:` `uofgcore` to demonstrate intra-monorepo dependencies. |
+
+Each package doubles as a worked example of a best-practice R package:
+roxygen documentation with runnable examples, error-path tests, input
+validation, S3 methods, and registered native code. See
+[ARCHITECTURE.md](ARCHITECTURE.md) for the design rationale.
 
 ## Prerequisites
 
@@ -116,6 +131,18 @@ renv::install("packages/uofgstats")        # install into the project library
   building from source.
 - New dependencies: `renv::install("pkg")`, then `renv::snapshot()` and commit
   `renv.lock`.
+
+## Editor & IDE support
+
+The repo is IDE-agnostic: everything critical is a CLI script. On top of
+that, each major editor gets first-class integration:
+
+| Editor | Setup |
+|--------|-------|
+| **RStudio** | Open `packages/<pkg>/<pkg>.Rproj` (e.g. `packages/uofgcore/uofgcore.Rproj`). The Build tab runs document/test/check via devtools, and the per-package `.Rprofile` activates the shared renv library automatically. |
+| **VSCode** | Open the repo root. Recommended extensions (R, renv, EditorConfig, R Debugger) are declared in `.vscode/extensions.json`. The R language server runs in multi-server mode (one LSP per package). `Terminal → Run Task` exposes build/lint/coverage; `Run and Debug` has one-click testthat debugging per package. |
+| **Neovim** | Any LSP client + `nvim-lspconfig`'s `r_language_server`, optionally `nvim-R` and treesitter-r. The LSP server is the same `languageserver` package locked in `renv.lock`, so completions/diagnostics match VSCode exactly. `.editorconfig` keeps formatting consistent. |
+| **Anything else** | Install the locked `languageserver` package into the renv library (already done via `renv.lock`) and point your editor at the project R. |
 
 ## Installing the packages
 

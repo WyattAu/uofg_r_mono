@@ -3,4 +3,5 @@
 export(fibonacci)
 export(greet)
 export(validate_numeric)
+export(zscore)
 useDynLib(uofgcore, .registration = TRUE)
