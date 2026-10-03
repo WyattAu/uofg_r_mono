@@ -58,6 +58,16 @@ for (path in pkg_paths) {
 }
 
 # --- landing page -----------------------------------------------------------
+# A quiet coverage attempt: nice-to-have, never fatal.
+coverage_note <- tryCatch({
+  out <- vapply(pkg_paths, function(path) {
+    pct <- covr::percent_coverage(covr::package_coverage(path, quiet = TRUE))
+    sprintf("%s: %.1f%%", basename(path), pct)
+  }, character(1))
+  paste0("<p><strong>Coverage:</strong> ", paste(out, collapse = " &middot; "),
+         "</p>")
+}, error = function(e) "")
+
 cards <- vapply(names(titles), function(pkg) {
   sprintf(
     '<a class="card" href="%s/"><h2>%s</h2><p>%s</p></a>\n',
@@ -78,6 +88,7 @@ landing <- c(
   "</style></head><body>",
   "<h1>uofg_r_mono</h1>",
   "<p>Reference documentation for the packages in this monorepo.</p>",
+  coverage_note,
   cards,
   "</body></html>"
 )
