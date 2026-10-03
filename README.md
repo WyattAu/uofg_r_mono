@@ -61,7 +61,24 @@ uofg_r_mono/
 | Package      | Description                                                        |
 |--------------|--------------------------------------------------------------------|
 | `uofgcore`   | Shared helpers: `greet()`, `validate_numeric()`, `zscore()`, plus the C-backed `fibonacci()` proving the native-code toolchain. |
-| `uofgstats`  | Statistical utilities: `rolling_mean()`, and the `fit_linreg()` / `tidy_linreg()` pair demonstrating formula interfaces and S3 classes. `Imports:` `uofgcore` to demonstrate intra-monorepo dependencies. |
+| `uofgstats`  | Numerically-robust building blocks for time-series analysis and financial backtesting: `rolling_mean()` (exact/fast methods), `to_returns()`, `fit_linreg()`/`tidy_linreg()` (S3 demo), `validate_ohlcv()` (checkmate data contract). Vignettes: getting started and backtesting hygiene. `Imports:` `uofgcore` to demonstrate intra-monorepo dependencies. |
+
+## Numerical environment
+
+Results involving floating-point linear algebra depend on the BLAS/LAPACK
+backend and thread configuration. Before publishing analyses, record the
+environment:
+
+```sh
+Rscript scripts/numerical-env.R
+```
+
+Reproducibility policy: seeds are set via `withr::with_seed()` (never
+global `set.seed()` in package code); parallel stochastic work uses
+L'Ecuyer streams (`RNGkind("L'Ecuyer-CMRG")` + `parallel::nextRNGStream()`).
+Numerical routines are verified in tests against arbitrary-precision
+references (`Rmpfr`), so a BLAS/backend change that alters results is
+caught by CI rather than by a reviewer.
 
 Each package doubles as a worked example of a best-practice R package:
 roxygen documentation with runnable examples, error-path tests, input

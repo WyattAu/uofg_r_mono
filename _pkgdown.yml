@@ -1,0 +1,15 @@
+url: https://wyattau.github.io/uofg_r_mono/
+
+# Shared pkgdown configuration, consumed by scripts/build-docs.R for every
+# package sub-site (pkgdown only auto-discovers this file at a package
+# root, which a monorepo does not have).
+#
+# NOTE: math rendering (MathJax) for mathematical theoretics in vignettes
+# is injected by scripts/build-docs.R *after* the site build, because
+# pkgdown 2.2.x's Bootstrap-5 template drops `math: mathjax: true` and
+# its Handlebars rmd template cannot compile script tags with backslashes.
+template:
+  bootstrap: 5
+
+development:
+  mode: auto

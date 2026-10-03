@@ -147,5 +147,9 @@ activates the monorepo library.
 | Style gate via "styler + git diff" | Zero-config (no style config file to maintain), byte-exact enforcement |
 | Spelling via `inst/WORDLIST` | Project vocabulary is code-reviewable next to the docs it appears in |
 | Defensive per-package `.Rprofile` | R subprocesses during checks start in temp trees; activation must be conditional |
+| `rolling_mean` exact-by-default | Cumulative-sum implementations cancel catastrophically at financial magnitudes (verified); correctness outranks O(n) |
+| `checkmate` for data contracts | Backtesting demands exhaustive, actionable validation; `validate_numeric` stays as the zero-dep teaching example |
+| `Rmpfr` verification harness | Numerical code must be checked against something better than itself |
+| MathJax injected post-build | pkgdown 2.2.x BS5 drops math config and its Handlebars template rejects script tags with backslashes |
 | Apache-2.0 | Permissive with explicit patent grant; matches repo LICENSE |
 | C code in the demo package | Proves the compiled-code toolchain in every CI leg |

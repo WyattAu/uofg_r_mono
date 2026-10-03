@@ -1,0 +1,132 @@
+---
+title: "Backtesting hygiene"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Backtesting hygiene}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+```
+
+A backtest is a numerical experiment, and experiments are only as
+trustworthy as their discipline. This vignette collects the hygiene
+rules this monorepo's tooling is designed to enforce, with worked
+examples.
+
+```{r setup, message = FALSE}
+library(uofgstats)
+library(xts)
+withr::local_seed(2026)
+```
+
+## 1. Validate the data before trusting any result
+
+Corrupted bars (High < Low, missing volumes, mis-sorted timestamps)
+produce confident nonsense. Reject them before analysis:
+
+```{r}
+prices <- data.frame(
+  Open   = c(100, 101, 102),
+  High   = c(102, 103, 104),
+  Low    = c(99, 100.5, 101),
+  Close  = c(101, 102, 103.5),
+  Volume = c(1000, 1200, 900)
+)
+validate_ohlcv(prices)
+```
+
+## 2. Causality: never let the future leak
+
+Every rolling function here is **trailing**: window `i` uses only data
+up to and including `i`. Truncating the future must never change past
+values — this is the look-ahead test, and you should apply it to every
+signal you write:
+
+```{r}
+x <- c(1, 2, 3, 4, 5, 6, 7)
+stopifnot(identical(
+  rolling_mean(x, 3)[1:3],
+  rolling_mean(x[1:5], 3)
+))
+```
+
+If a custom signal passes this test, it cannot peek ahead.
+
+## 3. Numerical accuracy at scale
+
+Rolling statistics over long histories accumulate floating-point drift
+if implemented with running sums. Compare the two methods on an
+adversarial series, and check against arbitrary-precision arithmetic
+in your own analyses with `Rmpfr`:
+
+```{r}
+x <- c(rep(1e16, 2), rep(1, 8))
+rolling_mean(x, 3, method = "exact") # exact by construction
+```
+
+Use `method = "fast"` for speed on well-scaled data; the default
+protects you when magnitudes are extreme.
+
+## 4. Time-based splits only
+
+Random train/test splits leak the future into the past. Split by time,
+and assert that the split is clean:
+
+```{r}
+dates <- seq(as.Date("2025-01-01"), by = "day", length.out = 100)
+prices <- xts(x = cumprod(1 + rnorm(100, 0.0004, 0.01)), order.by = dates)
+colnames(prices) <- "strategy"
+
+split_date <- as.Date("2025-03-01")
+cut <- which(zoo::index(prices) > split_date)[1L]
+train <- seq_len(cut - 1L)
+test <- seq.int(cut, length(prices))
+stopifnot(!any(train %in% test), max(train) < min(test))
+```
+
+## 5. Costs compound: model them
+
+A strategy with mean daily gross return $\mu_g$ and proportional cost
+$c$ per position change has net mean approximately
+$\mu_g - c \cdot \mathbb{E}|\Delta \text{position}|$ per rebalance.
+Even tiny costs dominate small edges:
+
+```{r}
+gross <- to_returns(as.numeric(prices))
+turnover <- abs(diff(signals <- rep(c(1, 0, 1), length.out = length(gross))))
+cost_per_trade <- 0.001 # 10 bps
+net <- gross * signals - cost_per_trade * turnover
+c(gross_mean = mean(gross), net_mean = mean(net))
+```
+
+## 6. Reproducible randomness
+
+- Fix seeds locally with `withr::with_seed()` so helpers never change
+  global state.
+- For parallel Monte Carlo, use L'Ecuyer streams so results are
+  reproducible regardless of worker count:
+
+```{r}
+withr::with_seed(42, x <- rnorm(3))
+withr::with_seed(42, y <- rnorm(3))
+stopifnot(identical(x, y))
+```
+
+```{r, eval = FALSE}
+# parallel-safe seeding pattern:
+RNGkind("L'Ecuyer-CMRG")
+set.seed(2026)
+streams <- parallel::nextRNGStream(123)
+```
+
+## Summary checklist
+
+1. `validate_ohlcv()` before analysis.
+2. Every signal passes the truncation (look-ahead) test.
+3. `method = "exact"` when magnitudes are extreme; verify with `Rmpfr`.
+4. Time-based splits, never random ones.
+5. Costs modeled per rebalance.
+6. Seeds via `withr`; parallel via L'Ecuyer streams.

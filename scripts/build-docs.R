@@ -53,7 +53,12 @@ for (path in pkg_paths) {
   # Absolute destination: pkgdown resolves relative paths against the
   # *package* directory, not the current working directory.
   dest <- file.path(root, "docs", "_site", pkg)
-  pkgdown::build_site(path, override = list(destination = dest), preview = FALSE)
+  # Shared root config (_pkgdown.yml: mathjax, template, ...) merged with
+  # per-package overrides.
+  shared <- if (file.exists("_pkgdown.yml")) yaml::read_yaml("_pkgdown.yml") else list()
+  shared$destination <- NULL
+  override <- c(list(destination = dest), shared)
+  pkgdown::build_site(path, override = override, preview = FALSE)
   titles[[pkg]] <- read.dcf(file.path(path, "DESCRIPTION"), "Title")[[1L]]
 }
 
@@ -93,5 +98,32 @@ landing <- c(
   "</body></html>"
 )
 writeLines(landing, file.path(site_dir, "index.html"))
+
+# --- inject MathJax into every built page -----------------------------------
+# pkgdown 2.2.x's Bootstrap-5 template does not emit a math renderer
+# (its BS3 template does), and its Handlebars rmd template cannot
+# compile script tags containing backslashes. Post-processing the built
+# HTML is version-proof. Single-$ delimiters are enabled so vignette
+# prose can use standard LaTeX notation.
+mathjax <- c(
+  "<script>",
+  "window.MathJax = window.MathJax || {};",
+  "window.MathJax.tex = window.MathJax.tex || {};",
+  "var bs = String.fromCharCode(92);",
+  'window.MathJax.tex.inlineMath = [["$", "$"], [bs + "(", bs + ")"]];',
+  'window.MathJax.tex.displayMath = [["$$", "$$"], [bs + "[", bs + "]"]];',
+  "</script>",
+  '<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>'
+)
+inject <- paste(mathjax, collapse = "\n")
+
+pages <- list.files(site_dir, pattern = "[.]html$", recursive = TRUE, full.names = TRUE)
+for (page in pages) {
+  txt <- readLines(page, warn = FALSE)
+  hit <- grep("</head>", txt, fixed = TRUE)
+  if (length(hit) > 0L && !any(grepl("MathJax-script", txt, fixed = TRUE))) {
+    writeLines(append(txt, inject, after = hit[[1L]] - 1L), page, useBytes = TRUE)
+  }
+}
 
 message("Site assembled under ", site_dir)

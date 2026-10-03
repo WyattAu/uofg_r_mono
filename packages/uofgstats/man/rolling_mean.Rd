@@ -4,25 +4,47 @@
 \alias{rolling_mean}
 \title{Compute a trailing rolling mean}
 \usage{
-rolling_mean(x, window)
+rolling_mean(x, window, method = c("exact", "fast"))
 }
 \arguments{
 \item{x}{A numeric vector.}
 
 \item{window}{A single positive integer, the window size. Must not
 exceed \code{length(x)}.}
+
+\item{method}{Character, one of \code{"exact"} (default) or \code{"fast"}.
+See \emph{Numerical accuracy}.}
 }
 \value{
 A numeric vector of length \code{length(x) - window + 1} where
 element \code{i} is \code{mean(x[seq.int(i, i + window - 1)])}.
 }
 \description{
-Computes the mean of \code{x} over trailing windows of length \code{window}
-using a cumulative-sum algorithm (O(length(x)) time). Input
-validation is delegated to \code{\link[uofgcore:validate_numeric]{uofgcore::validate_numeric()}}, which
-demonstrates how packages in this monorepo depend on one another.
+Computes the mean of \code{x} over trailing windows. \strong{Strictly causal}:
+window \code{i} uses only observations \code{i - window + 1} through \code{i}, so
+the function is safe for backtesting (no look-ahead).
 }
+\section{Numerical accuracy}{
+
+The \code{exact} method evaluates each window's mean through R's \code{sum()},
+which accumulates in extended (long double) precision. Each window is
+therefore accurate independently of the others: no accumulated drift,
+regardless of series length or magnitude. Cost is O(n * window).
+
+The \code{fast} method delegates to \code{data.table::frollmean()} (O(n),
+C-optimized, online algorithm). It can lose precision on adversarial
+inputs — long series mixing very large and very small magnitudes —
+where the running-sum representation cancels catastrophically. Use
+\code{exact} when correctness at extreme magnitudes matters (the default);
+use \code{fast} for speed on well-scaled data.
+}
+
 \examples{
 rolling_mean(c(1, 2, 3, 4, 5), 2)
-rolling_mean(c(1, 2, 3, 4, 5), 5)
+rolling_mean(c(1, 2, 3, 4, 5), 5, method = "fast")
+}
+\references{
+Higham, N. J. (2002). \emph{Accuracy and Stability of Numerical Algorithms}
+(2nd ed.), SIAM — chapter 4 covers summation error bounds and the
+catastrophic cancellation this function's \code{exact} method avoids.
 }
