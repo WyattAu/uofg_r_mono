@@ -31,7 +31,7 @@ jobs:
       matrix:
         r-version: ["release", "oldrel-1"]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # System libraries required by binary/source packages in renv.lock:
       #   libuv1        fs links it at runtime; runners do not ship it
@@ -58,7 +58,7 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Install system dependencies
         run: sudo apt-get update && sudo apt-get install -y libuv1-dev libhunspell-dev
@@ -76,7 +76,7 @@ jobs:
   style:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Install system dependencies
         run: sudo apt-get update && sudo apt-get install -y libuv1-dev libhunspell-dev
@@ -95,7 +95,7 @@ jobs:
   coverage:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Install system dependencies
         run: sudo apt-get update && sudo apt-get install -y libuv1-dev libhunspell-dev
