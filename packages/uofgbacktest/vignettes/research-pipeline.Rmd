@@ -1,0 +1,104 @@
+---
+title: "End-to-end research pipeline"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{End-to-end research pipeline}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+```
+
+This vignette is the monorepo showcase: one research question, answered
+by four packages working together. Each layer depends on the one before
+it, and the build system resolves that chain automatically.
+
+| Layer | Package | Role | Internal deps |
+|-------|---------|------|---------------|
+| 1 | `uofgcore` | validation helpers, compiled C interop | — |
+| 2 | `uofgstats` | rolling statistics, models, data contracts | `uofgcore` |
+| 3 | `uofgdata` | reproducible synthetic market data | `uofgstats` |
+| 4 | `uofgbacktest` | causal backtesting engine | `uofgcore`, `uofgdata`, `uofgstats` |
+
+```{r setup, message = FALSE}
+library(uofgbacktest)
+```
+
+## The question
+
+Does a fast-over-slow moving-average crossover earn its transaction
+costs on daily data? We answer it on synthetic data so the result is
+reproducible everywhere, forever.
+
+## 1. Generate data (uofgdata)
+
+```{r}
+mkt <- uofgdata::simulate_ohlcv(n_days = 500, seed = 42, vol = 0.01)
+head(mkt, 3)
+```
+
+The series satisfies the data contract by construction:
+
+```{r}
+uofgstats::validate_ohlcv(as.data.frame(mkt))
+```
+
+## 2. Time-based split (backtesting hygiene)
+
+```{r}
+prices <- as.numeric(mkt$Close)
+splits <- time_split(n = length(prices), train_frac = 0.7)
+stopifnot(max(splits$train) < min(splits$test))
+```
+
+The signal parameters would be tuned on `train`; `test` is touched once,
+at the end.
+
+## 3. Backtest (uofgbacktest)
+
+The engine enforces causality in code: a signal that peeks ahead is
+refused, not merely warned about.
+
+```{r}
+bt_train <- run_backtest(
+  prices[splits$train],
+  ma_signal,
+  cost_per_trade = 0.001
+)
+bt_train
+```
+
+## 4. Evaluate out of sample
+
+```{r}
+bt_test <- run_backtest(
+  prices[splits$test],
+  ma_signal,
+  cost_per_trade = 0.001
+)
+summary(bt_test)
+```
+
+## 5. Sanity-check the numerics
+
+`rolling_mean()` powers the signal. Its two methods agree on this
+well-scaled series — and the test suite verifies both against
+arbitrary-precision (`Rmpfr`) references, so this agreement is enforced,
+not hoped for:
+
+```{r}
+stopifnot(all.equal(
+  uofgstats::rolling_mean(prices, 20, method = "exact"),
+  uofgstats::rolling_mean(prices, 20, method = "fast")
+))
+```
+
+## Takeaway
+
+Every layer did one job: `uofgcore` validated, `uofgstats` computed and
+contract-checked, `uofgdata` made it reproducible, `uofgbacktest`
+enforced methodology. Because they live in one monorepo, all four were
+built, tested, checked, and versioned together by a single
+`Rscript scripts/build-all.R`.

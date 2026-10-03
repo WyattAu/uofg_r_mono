@@ -59,10 +59,20 @@ uofg_r_mono/
 
 ## Packages
 
-| Package      | Description                                                        |
-|--------------|--------------------------------------------------------------------|
-| `uofgcore`   | Shared helpers: `greet()`, `validate_numeric()`, `zscore()`, plus the C-backed `fibonacci()` proving the native-code toolchain. |
-| `uofgstats`  | Numerically-robust building blocks for time-series analysis and financial backtesting: `rolling_mean()` (exact/fast methods), `to_returns()`, `fit_linreg()`/`tidy_linreg()` (S3 demo), `validate_ohlcv()` (checkmate data contract). Vignettes: getting started and backtesting hygiene. `Imports:` `uofgcore` to demonstrate intra-monorepo dependencies. |
+| Package | Version | Description |
+|---------|---------|-------------|
+| `uofgcore` | 0.1.0 | Foundations: `greet()`, `validate_numeric()`, `zscore()`, and the C-backed `fibonacci()` proving the native-code toolchain. |
+| `uofgstats` | 0.2.0 | Numerically-robust statistics: `rolling_mean()` (exact/fast), `to_returns()`, `fit_linreg()`/`tidy_linreg()` (S3 demo), `validate_ohlcv()` data contract. Vignettes: getting started, backtesting hygiene. |
+| `uofgdata` | 0.1.0 | Reproducible synthetic OHLCV generation: `simulate_ohlcv()` — deterministic given a seed, contract-valid by construction. |
+| `uofgbacktest` | 0.1.0 | Causally-rigorous backtesting engine: `run_backtest()` (look-ahead rejection, lagged positions, per-rebalance costs), `ma_signal()` example signal, `time_split()`. Vignette: end-to-end research pipeline. |
+
+Together the four packages demonstrate the monorepo's core capability:
+a **layered research pipeline** in which each package depends on the
+previous one — `uofgbacktest` (engine) → `uofgdata` (data) →
+`uofgstats` (statistics) → `uofgcore` (foundations) — built, tested,
+checked, and released by a single command. The end-to-end flow is
+walked through in `uofgbacktest`'s "End-to-end research pipeline"
+vignette.
 
 ## Numerical environment
 

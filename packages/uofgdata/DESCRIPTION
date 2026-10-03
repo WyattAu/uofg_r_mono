@@ -1,0 +1,24 @@
+Package: uofgdata
+Type: Package
+Title: Synthetic Market Data for the UofG R Monorepo
+Version: 0.1.0
+Authors@R: person("Wyatt", "Au", , "wyatt_au@protonmail.com", role = c("aut", "cre"))
+Description: Reproducible synthetic OHLCV market data for research and
+    testing. Generated series provably satisfy the monorepo's data
+    contract (uofgstats::validate_ohlcv()) by construction, so examples
+    and backtests never depend on external data sources.
+License: Apache License (>= 2.0)
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+Imports:
+    checkmate,
+    stats,
+    uofgstats,
+    withr,
+    xts
+Suggests:
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+URL: https://github.com/WyattAu/uofg_r_mono
+BugReports: https://github.com/WyattAu/uofg_r_mono/issues
+Config/roxygen2/version: 8.1.0

@@ -1,0 +1,33 @@
+Package: uofgbacktest
+Type: Package
+Title: A Causally Rigorous Backtesting Engine for the UofG R Monorepo
+Version: 0.1.0
+Authors@R: person("Wyatt", "Au", , "wyatt_au@protonmail.com", role = c("aut", "cre"))
+Description: A small backtesting engine built on the monorepo's data and
+    statistics layers. Enforces the methodological rules from the
+    backtesting-hygiene vignette in code: signals must be causal
+    (look-ahead attempts are rejected), positions are applied with a
+    one-period lag, transaction costs are charged per position change,
+    and splits are time-based. Depends on 'uofgdata', 'uofgstats' and
+    'uofgcore' to demonstrate a multi-level internal dependency chain.
+License: Apache License (>= 2.0)
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+Imports:
+    checkmate,
+    stats,
+    uofgcore,
+    uofgdata,
+    uofgstats,
+    xts,
+    zoo
+Suggests:
+    knitr,
+    rmarkdown,
+    testthat (>= 3.0.0),
+    withr
+VignetteBuilder: knitr
+Config/testthat/edition: 3
+URL: https://github.com/WyattAu/uofg_r_mono
+BugReports: https://github.com/WyattAu/uofg_r_mono/issues
+Config/roxygen2/version: 8.1.0

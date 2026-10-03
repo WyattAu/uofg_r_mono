@@ -50,10 +50,11 @@ uofg_r_mono/
                                      v
   scripts/build-all.R ──topo-sorts──> packages/
                                      |
-                     uofgstats ──Imports──> uofgcore
-                  (statistical      |        (validation, C interop)
-                   utilities)       v
-                              consumers (your scripts, downstream repos)
+  uofgbacktest ──> uofgdata ──> uofgstats ──> uofgcore
+  (backtesting      (synthetic     (statistics,   (validation,
+   engine)           markets)       S3 models)     C interop)
+              \______________________________________
+                        consumers (your scripts, downstream repos)
 ```
 
 Internal dependencies are declared with plain `Imports:` in each
