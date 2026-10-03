@@ -76,7 +76,7 @@ jobs:
       # Install the monorepo packages so lintr resolves cross-file
       # symbols (object_usage_linter) exactly as it does locally.
       - name: Install monorepo packages
-        run: Rscript -e 'for (p in sort(list.dirs("packages", recursive = FALSE))) renv::install(normalizePath(p), prompt = FALSE)'
+        run: Rscript scripts/install-all.R
 
       - name: Lint all packages
         run: Rscript scripts/lint-all.R
