@@ -47,6 +47,7 @@ uofg_r_mono/
 │       └── uofgstats.Rproj
 ├── scripts/
 │   ├── build-all.R            # document → test → R CMD check → install, in dep order
+│   ├── build-docs.R           # pkgdown sites for all packages → docs/_site/
 │   ├── lint-all.R             # lintr gate (CI runs this as a separate job)
 │   └── coverage.R             # per-package covr report
 └── README.md
@@ -144,6 +145,22 @@ that, each major editor gets first-class integration:
 | **Neovim** | Any LSP client + `nvim-lspconfig`'s `r_language_server`, optionally `nvim-R` and treesitter-r. The LSP server is the same `languageserver` package locked in `renv.lock`, so completions/diagnostics match VSCode exactly. `.editorconfig` keeps formatting consistent. |
 | **Anything else** | Install the locked `languageserver` package into the renv library (already done via `renv.lock`) and point your editor at the project R. |
 
+## Documentation
+
+Reference documentation for every package is built by CI and published to
+GitHub Pages:
+
+**https://wyattau.github.io/uofg_r_mono/**
+
+`pkgdown` is intentionally *not* locked in `renv.lock`; the Docs workflow
+installs it into an isolated library at build time so the project
+toolchain stays slim (see ARCHITECTURE.md). To build the site locally:
+
+```sh
+Rscript scripts/build-all.R   # packages must be installed
+Rscript scripts/build-docs.R  # output in docs/_site/
+```
+
 ## Installing the packages
 
 Clone and build (recommended — runs the full pipeline):
@@ -161,6 +178,17 @@ CRAN, so dependency resolution cannot fetch it for you):
 # install.packages("remotes")
 remotes::install_github("WyattAu/uofg_r_mono/packages/uofgcore")
 remotes::install_github("WyattAu/uofg_r_mono/packages/uofgstats")
+```
+
+For pinned, reproducible installs, use the source tarballs attached to
+[GitHub releases](https://github.com/WyattAu/uofg_r_mono/releases) (a
+release is cut automatically by pushing a `v*` tag):
+
+```r
+install.packages(
+  "https://github.com/WyattAu/uofg_r_mono/releases/download/v0.1.0/uofgcore_0.1.0.tar.gz",
+  repos = NULL, type = "source"
+)
 ```
 
 ## Maintenance

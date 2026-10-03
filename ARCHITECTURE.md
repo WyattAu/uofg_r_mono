@@ -103,6 +103,11 @@ Deliberate choices:
   (public templates get users on older R), `fail-fast: false`.
 - **`lint`** — separate job on `release`; style failures shouldn't
   mask build failures.
+- **`docs`** — builds the pkgdown sites (one sub-site per package) and
+  deploys them to GitHub Pages. `pkgdown` is installed into an isolated
+  throwaway library by `scripts/build-docs.R`, keeping the lockfile slim.
+- **`release`** — on a `v*` tag, builds every package's source tarball
+  and attaches them to a GitHub release.
 - **Monthly cron** — runs the full pipeline against the current
   CRAN/R ecosystem, surfacing bitrot between human pushes.
 - Required status checks on `main` use the matrix context names

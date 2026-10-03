@@ -1,0 +1,61 @@
+# Build and deploy the pkgdown documentation site (one sub-site per
+# package) to GitHub Pages.
+#
+# pkgdown is deliberately NOT in renv.lock: this workflow installs it into
+# an isolated library via scripts/build-docs.R so the project lockfile
+# stays slim (see ARCHITECTURE.md, "Dependency strategy").
+
+name: Docs
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "packages/**"
+      - "scripts/**"
+      - ".github/workflows/docs.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install system dependencies
+        run: sudo apt-get update && sudo apt-get install -y libuv1-dev
+
+      - uses: r-lib/actions/setup-pandoc@v2
+
+      - uses: r-lib/actions/setup-r@v2
+
+      - uses: r-lib/actions/setup-renv@v2
+
+      - name: Install all packages
+        run: Rscript scripts/build-all.R
+
+      - name: Build documentation sites
+        run: Rscript scripts/build-docs.R
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/_site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
