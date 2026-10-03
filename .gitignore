@@ -47,3 +47,8 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
+
+# Compiled artifacts (R CMD build strips them from tarballs; keep them out of git too)
+*.o
+*.so
+*.dll
