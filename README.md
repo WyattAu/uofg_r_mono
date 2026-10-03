@@ -48,8 +48,11 @@ uofg_r_mono/
 ├── scripts/
 │   ├── build-all.R            # document → test → R CMD check → install, in dep order
 │   ├── build-docs.R           # pkgdown sites for all packages → docs/_site/
-│   ├── lint-all.R             # lintr gate (CI runs this as a separate job)
-│   └── coverage.R             # per-package covr report
+│   ├── coverage.R             # covr report + hard coverage threshold (90%)
+│   ├── lint-all.R             # lintr gate (CI job)
+│   ├── spellcheck-all.R       # spelling gate via inst/WORDLIST (CI step)
+│   └── style-all.R            # styler, applied in place (CI fails on diffs)
+├── Makefile                   # make build / lint / style / spellcheck / coverage / docs
 └── README.md
 ```
 
@@ -143,7 +146,7 @@ that, each major editor gets first-class integration:
 | **RStudio** | Open `packages/<pkg>/<pkg>.Rproj` (e.g. `packages/uofgcore/uofgcore.Rproj`). The Build tab runs document/test/check via devtools, and the per-package `.Rprofile` activates the shared renv library automatically. |
 | **VSCode** | Open the repo root. Recommended extensions (R, renv, EditorConfig, R Debugger) are declared in `.vscode/extensions.json`. The R language server runs in multi-server mode (one LSP per package). `Terminal → Run Task` exposes build/lint/coverage; `Run and Debug` has one-click testthat debugging per package. |
 | **Neovim** | Any LSP client + `nvim-lspconfig`'s `r_language_server`, optionally `nvim-R` and treesitter-r. The LSP server is the same `languageserver` package locked in `renv.lock`, so completions/diagnostics match VSCode exactly. `.editorconfig` keeps formatting consistent. |
-| **Anything else** | Install the locked `languageserver` package into the renv library (already done via `renv.lock`) and point your editor at the project R. |
+| **Terminal** | `make build`, `make lint`, `make style`, `make spellcheck`, `make coverage`, `make docs` — thin wrappers over the same scripts CI runs. |
 
 ## Documentation
 

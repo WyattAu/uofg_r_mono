@@ -1,0 +1,12 @@
+# Keep the Actions tooling itself current; dependabot opens a PR when
+# action versions move. renv.lock dependency refreshes are a manual,
+# monthly ritual (see README "Maintenance").
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    groups:
+      actions:
+        patterns: ["*"]

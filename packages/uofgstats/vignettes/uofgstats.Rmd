@@ -1,0 +1,66 @@
+---
+title: "Getting started with uofgstats"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting started with uofgstats}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+This vignette walks through the two main entry points of uofgstats:
+`rolling_mean()` for moving-window summaries and `fit_linreg()` for
+linear models with a tidy coefficient table. It also demonstrates the
+package conventions this monorepo follows.
+
+```{r setup}
+library(uofgstats)
+```
+
+## Rolling means
+
+`rolling_mean()` computes trailing means in O(n) using a cumulative-sum
+algorithm. Input validation is shared with `uofgcore`, so bad input
+fails with a consistent error style across the whole monorepo:
+
+```{r}
+rolling_mean(c(1, 2, 3, 4, 5), 2)
+```
+
+```{r, error = TRUE}
+rolling_mean(c(1, 2), 5)
+```
+
+## Linear models
+
+`fit_linreg()` wraps `stats::lm()` in a light S3 class. Printing it
+gives a compact summary, and `tidy_linreg()` returns coefficients as a
+plain data frame (no tidyverse dependency required):
+
+```{r}
+fit <- fit_linreg(y ~ x, data.frame(x = 1:5, y = c(2.1, 3.9, 6.2, 8.1, 9.8)))
+tidy_linreg(fit)
+```
+
+Additional arguments are forwarded to `stats::lm()`, including
+non-standard-evaluation arguments like `weights`:
+
+```{r}
+weighted <- data.frame(x = 1:3, y = c(1, 2, 9), w = c(1, 1, 10))
+tidy_linreg(fit_linreg(y ~ x, weighted, weights = w))
+```
+
+## Validation
+
+Helpers from `uofgcore` are re-exported nowhere; call them through the
+namespace. Validation errors always name the offending argument:
+
+```{r, error = TRUE}
+uofgcore::validate_numeric("not numeric")
+```

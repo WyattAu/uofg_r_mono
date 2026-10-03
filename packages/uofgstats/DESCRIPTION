@@ -13,7 +13,10 @@ Imports:
     stats,
     uofgcore
 Suggests:
+    knitr,
+    rmarkdown,
     testthat (>= 3.0.0)
+VignetteBuilder: knitr
 Config/testthat/edition: 3
 URL: https://github.com/WyattAu/uofg_r_mono
 BugReports: https://github.com/WyattAu/uofg_r_mono/issues

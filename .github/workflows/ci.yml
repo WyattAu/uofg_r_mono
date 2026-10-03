@@ -1,8 +1,12 @@
-# Build, check, and test every package in the monorepo.
+# Build, check, test, lint, style-check, and coverage-gate every package
+# in the monorepo.
 #
 # Relies on renv (restored via r-lib/actions/setup-renv) for the
-# toolchain, and on scripts/build-all.R for the per-package pipeline:
-# document -> test -> R CMD check --as-cran -> install.
+# toolchain, and on scripts/*.R for the per-package pipelines:
+#   build-all.R    document -> test -> R CMD check --as-cran -> install
+#   lint-all.R     lintr + spelling
+#   style-all.R    styler (CI fails if it would change anything)
+#   coverage.R     test coverage with a hard threshold
 
 name: CI
 
@@ -29,10 +33,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # System libraries required by binary/source packages in renv.lock
-      # (fs links libuv1 at runtime; GitHub runners do not ship it).
+      # System libraries required by binary/source packages in renv.lock:
+      #   libuv1        fs links it at runtime; runners do not ship it
+      #   libhunspell   spelling (locked) links it; restored in every job
       - name: Install system dependencies
-        run: sudo apt-get update && sudo apt-get install -y libuv1-dev
+        run: sudo apt-get update && sudo apt-get install -y libuv1-dev libhunspell-dev
+
+      - uses: r-lib/actions/setup-pandoc@v2
 
       - uses: r-lib/actions/setup-r@v2
         with:
@@ -43,13 +50,18 @@ jobs:
       - name: Document, test, check, and install all packages
         run: Rscript scripts/build-all.R
 
+      # build-all.R regenerates NAMESPACE/man/Collate. Any leftover diff
+      # means documentation was committed stale.
+      - name: Verify generated files are up to date
+        run: git diff --exit-code
+
   lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
       - name: Install system dependencies
-        run: sudo apt-get update && sudo apt-get install -y libuv1-dev
+        run: sudo apt-get update && sudo apt-get install -y libuv1-dev libhunspell-dev
 
       - uses: r-lib/actions/setup-r@v2
 
@@ -57,3 +69,42 @@ jobs:
 
       - name: Lint all packages
         run: Rscript scripts/lint-all.R
+
+      - name: Spell-check all packages
+        run: Rscript scripts/spellcheck-all.R
+
+  style:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install system dependencies
+        run: sudo apt-get update && sudo apt-get install -y libuv1-dev libhunspell-dev
+
+      - uses: r-lib/actions/setup-r@v2
+
+      - uses: r-lib/actions/setup-renv@v2
+
+      # Fail if styler would change anything: formatting belongs in the
+      # commit, not the review.
+      - name: Style all packages and fail on diffs
+        run: |
+          Rscript scripts/style-all.R
+          git diff --exit-code
+
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install system dependencies
+        run: sudo apt-get update && sudo apt-get install -y libuv1-dev libhunspell-dev
+
+      - uses: r-lib/actions/setup-pandoc@v2
+
+      - uses: r-lib/actions/setup-r@v2
+
+      - uses: r-lib/actions/setup-renv@v2
+
+      - name: Coverage gate (threshold from scripts/coverage.R)
+        run: Rscript scripts/coverage.R

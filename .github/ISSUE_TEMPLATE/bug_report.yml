@@ -1,0 +1,39 @@
+name: Bug report
+description: Something in uofgcore or uofgstats is broken
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Before filing: `Rscript scripts/build-all.R` is the fastest way to
+        check whether the problem reproduces with a clean pipeline.
+  - type: dropdown
+    id: package
+    attributes:
+      label: Package
+      options:
+        - uofgcore
+        - uofgstats
+        - repository infrastructure (CI, renv, scripts)
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Minimal reproduction code plus actual vs expected behavior.
+      placeholder: |
+        ```r
+        library(uofgstats)
+        rolling_mean("oops", 1)
+        ```
+    validations:
+      required: true
+  - type: textarea
+    id: session-info
+    attributes:
+      label: Session info
+      description: Output of `sessioninfo::session_info()` (install.packages("sessioninfo") if missing).
+      render: text
+    validations:
+      required: true

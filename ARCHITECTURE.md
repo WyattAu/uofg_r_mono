@@ -100,9 +100,15 @@ Deliberate choices:
 ## CI topology
 
 - **`build-and-check`** — matrix over R `release` and `oldrel-1`
-  (public templates get users on older R), `fail-fast: false`.
-- **`lint`** — separate job on `release`; style failures shouldn't
-  mask build failures.
+  (public templates get users on older R), `fail-fast: false`. After the
+  pipeline, `git diff --exit-code` verifies generated files (NAMESPACE,
+  man/, Collate) were committed fresh.
+- **`lint`** — lintr *and* spelling (`spelling::spell_check_package`,
+  project terms in each package's `inst/WORDLIST`).
+- **`style`** — runs styler, then fails if `git diff` is non-empty:
+  formatting belongs in the commit, not the review.
+- **`coverage`** — covr with a hard threshold (90%, set in
+  `scripts/coverage.R`); a coverage regression blocks merge.
 - **`docs`** — builds the pkgdown sites (one sub-site per package) and
   deploys them to GitHub Pages. `pkgdown` is installed into an isolated
   throwaway library by `scripts/build-docs.R`, keeping the lockfile slim.
@@ -110,9 +116,9 @@ Deliberate choices:
   and attaches them to a GitHub release.
 - **Monthly cron** — runs the full pipeline against the current
   CRAN/R ecosystem, surfacing bitrot between human pushes.
-- Required status checks on `main` use the matrix context names
-  (`CI / build-and-check (release)`, ...), so every supported R version
-  must pass before merge.
+- Required status checks on `main` use the job context names
+  (`CI / build-and-check (release)`, `CI / style`, `CI / coverage`, ...),
+  so every supported R version and every gate must pass before merge.
 
 ## IDE strategy
 
@@ -137,5 +143,9 @@ activates the monorepo library.
 | Single shared lockfile | One toolchain truth; per-package lockfiles would drift |
 | Slim toolchain, no `devtools` | CI runners lack `libgit2`; 58 vs 161 packages; CI minutes |
 | `roxygen2`/`testthat` called directly | Same behavior as devtools wrappers without the tree |
+| Coverage threshold as a CI gate | Coverage that isn't enforced only trends downward |
+| Style gate via "styler + git diff" | Zero-config (no style config file to maintain), byte-exact enforcement |
+| Spelling via `inst/WORDLIST` | Project vocabulary is code-reviewable next to the docs it appears in |
+| Defensive per-package `.Rprofile` | R subprocesses during checks start in temp trees; activation must be conditional |
 | Apache-2.0 | Permissive with explicit patent grant; matches repo LICENSE |
 | C code in the demo package | Proves the compiled-code toolchain in every CI leg |

@@ -1,0 +1,21 @@
+# Optional pre-commit hooks. Install with:
+#   pip install pre-commit && precommit::use_precommit()  # or: pre-commit install
+# The lintr/style/spell hooks mirror scripts/style-all.R, scripts/lint-all.R
+# and scripts/spellcheck-all.R, so hook failures match CI failures.
+#
+# Pins are bumped automatically by dependabot (github-actions ecosystem
+# covers only workflows; bump these via `pre-commit autoupdate`).
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+  - repo: https://github.com/lorenzwalthert/precommit
+    rev: v0.3.2
+    hooks:
+      - id: style
+      - id: lintr
+      - id: spell-check
+      - id: readme-rmd-rendered

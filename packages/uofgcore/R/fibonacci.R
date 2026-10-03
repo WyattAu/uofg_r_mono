@@ -24,7 +24,9 @@ fibonacci <- function(n) {
   }
   if (n > 78) {
     stop("`n` must be at most 78: larger results are not exactly ",
-         "representable as doubles.", call. = FALSE)
+      "representable as doubles.",
+      call. = FALSE
+    )
   }
   # uofgcore_fibonacci is bound into this namespace via useDynLib() in the
   # NAMESPACE; the object usage linter cannot see that binding.
