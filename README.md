@@ -1,6 +1,7 @@
 # uofg_r_mono
 
 [![CI](https://github.com/WyattAu/uofg_r_mono/actions/workflows/ci.yml/badge.svg)](https://github.com/WyattAu/uofg_r_mono/actions/workflows/ci.yml)
+[![coverage](https://img.shields.io/endpoint?url=https://wyattau.github.io/uofg_r_mono/coverage.json)](https://wyattau.github.io/uofg_r_mono/)
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 
 An R **monorepo** template: multiple R packages live in one repository, sharing a single

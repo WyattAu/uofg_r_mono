@@ -126,4 +126,20 @@ for (page in pages) {
   }
 }
 
+# --- coverage badge endpoint ------------------------------------------------
+# shields.io endpoint JSON at docs/_site/coverage.json, refreshed on every
+# docs deploy. Quiet failure: a coverage hiccup must not break the deploy.
+coverage_json <- tryCatch({
+  pct <- vapply(pkg_paths, function(path) {
+    covr::percent_coverage(covr::package_coverage(path, quiet = TRUE))
+  }, numeric(1))
+  sprintf('{"schemaVersion":1,"label":"coverage","message":"%.1f%%"}', mean(pct))
+}, error = function(e) {
+  message("coverage badge skipped: ", conditionMessage(e))
+  NULL
+})
+if (!is.null(coverage_json)) {
+  writeLines(coverage_json, file.path(site_dir, "coverage.json"))
+}
+
 message("Site assembled under ", site_dir)
