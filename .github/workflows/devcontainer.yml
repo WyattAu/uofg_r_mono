@@ -1,0 +1,25 @@
+# Validates the devcontainer builds and runs. Canary only: not a
+# required merge check (container builds are slow).
+
+name: Devcontainer
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".devcontainer/**"
+  pull_request:
+    paths:
+      - ".devcontainer/**"
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Build and run devcontainer
+        uses: devcontainers/ci@v0.3
+        with:
+          runCmd: Rscript -e 'cat(R.version.string, "| renv", as.character(packageVersion("renv")), "\n")'
