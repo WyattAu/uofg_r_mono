@@ -1,0 +1,16 @@
+{
+  "name": "UofG R Monorepo",
+  "image": "ghcr.io/rocker-org/devcontainer/r-ver:4.6",
+  "postCreateCommand": "sudo apt-get update && sudo apt-get install -y libuv1-dev libhunspell-dev libmpfr-dev pandoc && Rscript -e 'if (!requireNamespace(\"renv\", quietly = TRUE)) install.packages(\"renv\", repos = \"https://cloud.r-project.org\")' && Rscript -e 'renv::restore(prompt = FALSE)'",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "REditorSupport.r",
+        "REditorSupport.r-renv",
+        "EditorConfig.EditorConfig",
+        "REditorSupport.vscode-R-debugger",
+        "github.vscode-github-actions"
+      ]
+    }
+  }
+}

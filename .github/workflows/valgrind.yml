@@ -1,0 +1,36 @@
+# Weekly memory check of the compiled code under valgrind.
+# Canary only: not a required merge check.
+
+name: valgrind
+
+on:
+  schedule:
+    - cron: "0 7 * * 0" # Sundays 07:00 UTC
+  workflow_dispatch:
+
+jobs:
+  memcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install valgrind and system libraries
+        run: sudo apt-get update && sudo apt-get install -y valgrind libuv1-dev
+
+      - uses: r-lib/actions/setup-r@v2
+
+      - uses: r-lib/actions/setup-renv@v2
+
+      - name: R CMD check under valgrind (uofgcore)
+        run: |
+          R CMD build --no-manual --no-build-vignettes packages/uofgcore
+          R CMD check --use-valgrind --no-manual --no-examples --ignore-vignettes uofgcore_*.tar.gz
+
+      - name: Fail on memory errors
+        run: |
+          if grep -rqE "Invalid (read|write)|Conditional jump or move depends|Mismatched free" uofgcore.Rcheck/; then
+            echo "valgrind reported memory errors:"
+            grep -rE "Invalid (read|write)|Conditional jump or move depends|Mismatched free" uofgcore.Rcheck/ | head -20
+            exit 1
+          fi
+          echo "no valgrind memory errors in uofgcore"
