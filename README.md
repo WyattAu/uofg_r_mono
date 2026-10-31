@@ -23,7 +23,7 @@ To turn this repository into your own project:
    delete `renv.lock`, then run `renv::init(bare = TRUE)` and reinstall
    only the tools you need, e.g. `renv::install(c("devtools", "rcmdcheck"))`,
    followed by `renv::snapshot()`.
-4. **Update this README** — everything between the badges and the
+4. **Update this README**; everything between the badges and the
    Troubleshooting section describes the template itself.
 
 ## Repository layout
@@ -38,7 +38,7 @@ uofg_r_mono/
 ├── .vscode/                   # R LSP (multi-server), tasks, debug configs
 ├── ARCHITECTURE.md            # why the monorepo is shaped this way
 ├── CONTRIBUTING.md            # how to contribute
-├── renv.lock                  # pinned package versions — commit this
+├── renv.lock                  # pinned package versions; commit this
 ├── renv/                      # renv internals; renv/library is machine-local
 ├── packages/
 │   ├── uofgcore/              # base package (incl. compiled C code under src/)
@@ -63,13 +63,13 @@ uofg_r_mono/
 |---------|---------|-------------|
 | `uofgcore` | 0.1.0 | Foundations: `greet()`, `validate_numeric()`, `zscore()`, and the C-backed `fibonacci()` proving the native-code toolchain. |
 | `uofgstats` | 0.2.0 | Numerically-robust statistics: `rolling_mean()` (exact/fast), `to_returns()`, `fit_linreg()`/`tidy_linreg()` (S3 demo), `validate_ohlcv()` data contract. Vignettes: getting started, backtesting hygiene. |
-| `uofgdata` | 0.1.0 | Reproducible synthetic OHLCV generation: `simulate_ohlcv()` — deterministic given a seed, contract-valid by construction. |
+| `uofgdata` | 0.1.0 | Reproducible synthetic OHLCV generation: `simulate_ohlcv()`; deterministic given a seed, contract-valid by construction. |
 | `uofgbacktest` | 0.1.0 | Causally-rigorous backtesting engine: `run_backtest()` (look-ahead rejection, lagged positions, per-rebalance costs), `ma_signal()` example signal, `time_split()`. Vignette: end-to-end research pipeline. |
 
 Together the four packages demonstrate the monorepo's core capability:
 a **layered research pipeline** in which each package depends on the
-previous one — `uofgbacktest` (engine) → `uofgdata` (data) →
-`uofgstats` (statistics) → `uofgcore` (foundations) — built, tested,
+previous one; `uofgbacktest` (engine) → `uofgdata` (data) →
+`uofgstats` (statistics) → `uofgcore` (foundations); built, tested,
 checked, and released by a single command. The end-to-end flow is
 walked through in `uofgbacktest`'s "End-to-end research pipeline"
 vignette.
@@ -99,7 +99,7 @@ validation, S3 methods, and registered native code. See
 ## Prerequisites
 
 - R >= 4.1 (developed against 4.6)
-- A C compiler toolchain (gcc/clang + make) — only needed because `uofgcore` contains compiled code
+- A C compiler toolchain (gcc/clang + make); only needed because `uofgcore` contains compiled code
 - `git`
 
 ## Getting started
@@ -110,7 +110,7 @@ renv::restore()   # installs the exact toolchain recorded in renv.lock
 ```
 
 The `.Rprofile` activates renv automatically, so any R session started inside the
-repository already uses the project library — no `library()` bookkeeping needed.
+repository already uses the project library; no `library()` bookkeeping needed.
 
 ## Day-to-day workflow
 
@@ -122,8 +122,8 @@ Rscript scripts/build-all.R
 
 > Note: `R CMD check --as-cran` reports a *"Strong dependencies not in the CRAN
 > ... repositories: uofgcore"* warning for packages that depend on other
-> monorepo packages. That is expected — internal dependencies are not on
-> CRAN — and does not fail the build.
+> monorepo packages. That is expected; internal dependencies are not on
+> CRAN; and does not fail the build.
 
 Or work on a single package interactively:
 
@@ -137,14 +137,14 @@ renv::install("packages/uofgstats")        # install into the project library
 > Prefer the `devtools`/`usethis` interactive toolkit? It is intentionally
 > *not* locked in `renv.lock` (its dependency tree is heavy and drags in
 > system libraries CI does not ship). Install it locally without locking
-> it in: `renv::install("devtools")` — just don't `renv::snapshot()` it.
+> it in: `renv::install("devtools")`; just don't `renv::snapshot()` it.
 
 ## Adding a new package
 
 1. Create `packages/<yourpkg>/` with at least a `DESCRIPTION`, `R/` sources with
    roxygen comments, and `tests/`. The easiest way is to copy an existing package
    folder and adjust `DESCRIPTION`.
-2. To depend on another package in this repo, list it under `Imports:` — the build
+2. To depend on another package in this repo, list it under `Imports:`; the build
    script topologically sorts packages, so internal dependencies resolve in the
    right order automatically.
 3. Add the package name to `renv::settings$ignored.packages(...)` (one-time, in
@@ -157,7 +157,7 @@ renv::install("packages/uofgstats")        # install into the project library
   (`roxygen2`, `testthat`, `rcmdcheck`, `lintr`, `styler`, `covr`).
 - `renv/library/` is machine-local and gitignored; recreate it with `renv::restore()`.
 - The monorepo's own packages are registered as *ignored packages*, so renv never
-  tries to install them from CRAN — `scripts/build-all.R` installs them from source.
+  tries to install them from CRAN; `scripts/build-all.R` installs them from source.
 - CRAN is proxied through Posit Public Package Manager (see `.Rprofile`) so CI
   installs fast binary packages; unsupported platforms transparently fall back to
   building from source.
@@ -174,7 +174,7 @@ that, each major editor gets first-class integration:
 | **RStudio** | Open `packages/<pkg>/<pkg>.Rproj` (e.g. `packages/uofgcore/uofgcore.Rproj`). The Build tab runs document/test/check via devtools, and the per-package `.Rprofile` activates the shared renv library automatically. |
 | **VSCode** | Open the repo root. Recommended extensions (R, renv, EditorConfig, R Debugger) are declared in `.vscode/extensions.json`. The R language server runs in multi-server mode (one LSP per package). `Terminal → Run Task` exposes build/lint/coverage; `Run and Debug` has one-click testthat debugging per package. |
 | **Neovim** | Any LSP client + `nvim-lspconfig`'s `r_language_server`, optionally `nvim-R` and treesitter-r. The LSP server is the same `languageserver` package locked in `renv.lock`, so completions/diagnostics match VSCode exactly. `.editorconfig` keeps formatting consistent. |
-| **Terminal** | `make build`, `make lint`, `make style`, `make spellcheck`, `make coverage`, `make docs` — thin wrappers over the same scripts CI runs. |
+| **Terminal** | `make build`, `make lint`, `make style`, `make spellcheck`, `make coverage`, `make docs`; thin wrappers over the same scripts CI runs. |
 
 ## Documentation
 
@@ -194,7 +194,7 @@ Rscript scripts/build-docs.R  # output in docs/_site/
 
 ## Installing the packages
 
-Clone and build (recommended — runs the full pipeline):
+Clone and build (recommended; runs the full pipeline):
 
 ```sh
 git clone https://github.com/WyattAu/uofg_r_mono && cd uofg_r_mono
@@ -202,7 +202,7 @@ Rscript -e 'renv::restore()'
 Rscript scripts/build-all.R
 ```
 
-Or install directly from GitHub (install `uofgcore` first — it is not on
+Or install directly from GitHub (install `uofgcore` first; it is not on
 CRAN, so dependency resolution cannot fetch it for you):
 
 ```r
@@ -242,9 +242,9 @@ so bitrot is surfaced even when nobody touches the repository.
 [`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs on every push/PR
 (and monthly on a schedule):
 
-1. `r-lib/actions/setup-r` — matrix over R `release` and `oldrel-1`,
+1. `r-lib/actions/setup-r`; matrix over R `release` and `oldrel-1`,
 2. `r-lib/actions/setup-renv` restoring `renv.lock` (with caching),
-3. `Rscript scripts/build-all.R` — documents, tests, `R CMD check --as-cran`, and
+3. `Rscript scripts/build-all.R`; documents, tests, `R CMD check --as-cran`, and
    installs every package; the job fails on any error or test failure.
 
 A separate `lint` job runs `scripts/lint-all.R` on `release`.

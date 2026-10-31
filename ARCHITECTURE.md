@@ -18,7 +18,7 @@ see [CONTRIBUTING](CONTRIBUTING.md).
    conveniences layered on top, never requirements.
 4. **The pipeline is the contract.** If `Rscript scripts/build-all.R`
    passes locally, CI passes remotely. CI runs exactly what the script
-   runs — no special CI-only steps.
+   runs; no special CI-only steps.
 
 ## Layout
 
@@ -60,7 +60,7 @@ uofg_r_mono/
 Internal dependencies are declared with plain `Imports:` in each
 package's `DESCRIPTION`. The build script parses those declarations and
 topologically sorts the packages, so internal dependencies are always
-built and installed before their dependents — no manual ordering, ever.
+built and installed before their dependents; no manual ordering, ever.
 
 ## Build pipeline
 
@@ -91,8 +91,7 @@ Deliberate choices:
   URL (`.Rprofile`). renv transforms that URL per platform: binary
   packages where supported (Ubuntu CI), source builds elsewhere.
 - The toolchain is intentionally **slim** (58 packages): the pipeline
-  needs `roxygen2`, `testthat`, `rcmdcheck`, `lintr`, `styler`, `covr`
-  — not the `devtools` meta-tree, whose heavy system-library
+  needs `roxygen2`, `testthat`, `rcmdcheck`, `lintr`, `styler`, `covr` : not the `devtools` meta-tree, whose heavy system-library
   dependencies (e.g. `gert` → `libgit2`) fail on minimal CI runners.
 - **Binary vs source is decided by renv**, not us: PPM binaries must
   never be force-installed on machines whose dynamic loader cannot
@@ -100,22 +99,22 @@ Deliberate choices:
 
 ## CI topology
 
-- **`build-and-check`** — matrix over R `release` and `oldrel-1`
+- **`build-and-check`**; matrix over R `release` and `oldrel-1`
   (public templates get users on older R), `fail-fast: false`. After the
   pipeline, `git diff --exit-code` verifies generated files (NAMESPACE,
   man/, Collate) were committed fresh.
-- **`lint`** — lintr *and* spelling (`spelling::spell_check_package`,
+- **`lint`**; lintr *and* spelling (`spelling::spell_check_package`,
   project terms in each package's `inst/WORDLIST`).
-- **`style`** — runs styler, then fails if `git diff` is non-empty:
+- **`style`**; runs styler, then fails if `git diff` is non-empty:
   formatting belongs in the commit, not the review.
-- **`coverage`** — covr with a hard threshold (90%, set in
+- **`coverage`**; covr with a hard threshold (90%, set in
   `scripts/coverage.R`); a coverage regression blocks merge.
-- **`docs`** — builds the pkgdown sites (one sub-site per package) and
+- **`docs`**; builds the pkgdown sites (one sub-site per package) and
   deploys them to GitHub Pages. `pkgdown` is installed into an isolated
   throwaway library by `scripts/build-docs.R`, keeping the lockfile slim.
-- **`release`** — on a `v*` tag, builds every package's source tarball
+- **`release`**; on a `v*` tag, builds every package's source tarball
   and attaches them to a GitHub release.
-- **Monthly cron** — runs the full pipeline against the current
+- **Monthly cron**; runs the full pipeline against the current
   CRAN/R ecosystem, surfacing bitrot between human pushes.
 - Required status checks on `main` use the job context names
   (`CI / build-and-check (release)`, `CI / style`, `CI / coverage`, ...),
@@ -141,8 +140,8 @@ activates the monorepo library.
 This repository is the downstream research deployment of a template
 family: [OmniR-template](https://github.com/WyattAu/OmniR-template) is
 the general upstream (alongside OmniCPP-template and OmniLaTeX-template
-for other languages). Shared infrastructure — `scripts/`, CI workflows,
-lint/format configs, the Makefile — should land upstream first, then be
+for other languages). Shared infrastructure; `scripts/`, CI workflows,
+lint/format configs, the Makefile; should land upstream first, then be
 ported here. `scripts/template-sync-check.sh` reports divergence
 against the upstream; run it before refactoring infrastructure.
 

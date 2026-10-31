@@ -44,7 +44,7 @@ in the README Troubleshooting section and `.Renviron`.
   Genuine project terms go in `inst/WORDLIST`
   (`spelling::update_wordlist()`); typos get fixed.
 - Every exported function needs roxygen documentation with `@examples`.
-- Every behavior needs a testthat test — including error paths. New
+- Every behavior needs a testthat test; including error paths. New
   user-facing output deserves a snapshot test (`expect_snapshot`).
 - User guides live in `vignettes/`; keep them knitting
   (`devtools`' Build > Render, or `rmarkdown::render()`).
@@ -67,7 +67,7 @@ tests.
 
 - New dependency on an existing package: `renv::install("pkg")`, use it,
   then `renv::snapshot()` and commit `renv.lock` together with your code.
-- Do **not** add `devtools`/`usethis`/`pkgdown` to the lockfile — they
+- Do **not** add `devtools`/`usethis`/`pkgdown` to the lockfile; they
   are intentionally excluded (see ARCHITECTURE.md, "Dependency
   strategy"). Install them locally without snapshotting.
 - The monthly CI schedule will surface CRAN-side breakage; address it by
