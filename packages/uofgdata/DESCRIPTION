@@ -21,4 +21,4 @@ Suggests:
 Config/testthat/edition: 3
 URL: https://github.com/WyattAu/uofg_r_mono
 BugReports: https://github.com/WyattAu/uofg_r_mono/issues
-Config/roxygen2/version: 8.1.0
+Config/roxygen2/version: 8.1.1
