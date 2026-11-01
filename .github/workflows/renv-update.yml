@@ -48,7 +48,7 @@ jobs:
         run: Rscript -e 'renv::snapshot(prompt = FALSE); cat("lockfile updated\n")'
 
       - name: Create update PR
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v8
         with:
           branch: renv-monthly-update
           delete-branch: true
