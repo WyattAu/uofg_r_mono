@@ -65,8 +65,9 @@ uofg_r_mono/
 | `uofgstats` | 0.2.0 | Numerically-robust statistics: `rolling_mean()` (exact/fast), `to_returns()`, `fit_linreg()`/`tidy_linreg()` (S3 demo), `validate_ohlcv()` data contract. Vignettes: getting started, backtesting hygiene. |
 | `uofgdata` | 0.1.0 | Reproducible synthetic OHLCV generation: `simulate_ohlcv()`; deterministic given a seed, contract-valid by construction. |
 | `uofgbacktest` | 0.1.0 | Causally-rigorous backtesting engine: `run_backtest()` (look-ahead rejection, lagged positions, per-rebalance costs), `ma_signal()` example signal, `time_split()`. Vignette: end-to-end research pipeline. |
+| `lab4` | 0.1.0 | Standalone stats-course lab: deterministic survey populations (`global_monitor`, `us_adults`), `sample_props()` sampling-distribution simulator, `prop_ci()` Wald intervals. Vignette: the complete Lab 4 walkthrough with answers. |
 
-Together the four packages demonstrate the monorepo's core capability:
+Together the four pipeline packages demonstrate the monorepo's core capability:
 a **layered research pipeline** in which each package depends on the
 previous one; `uofgbacktest` (engine) → `uofgdata` (data) →
 `uofgstats` (statistics) → `uofgcore` (foundations); built, tested,

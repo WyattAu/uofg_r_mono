@@ -1,0 +1,189 @@
+---
+title: "Lab 4: Sampling Distributions and Confidence Intervals"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Lab 4: Sampling Distributions and Confidence Intervals}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 4
+)
+```
+
+```{r setup}
+library(lab4)
+```
+
+This vignette works through the Lab 4 group tasks. Part 1 estimates the
+proportion of people who think the work scientists do benefits them
+(`global_monitor`, where the true proportion is 0.80). Part 2 builds a
+confidence interval for the proportion of US adults who think climate
+change is affecting their local community (`us_adults`, true proportion
+0.62). Every random draw uses a fixed seed (`sample_props()` applies it
+via `withr::with_seed()`), so all numbers here are reproducible.
+
+```{r populations}
+table(global_monitor$scientist_work)
+table(us_adults$climate_change_affects)
+```
+
+# Part 1: Sampling distributions
+
+Task 1 takes a single sample of size 20. Task 2 and Task 3 repeat that
+sampling 2000 times to build sampling distributions for n = 20 and
+n = 200 and compare their shape and spread.
+
+## Task 1: one sample of size 20
+
+```{r task-1}
+p_hat1 <- sample_props(global_monitor, "scientist_work", "Benefits",
+  size = 20, reps = 1, seed = 42
+)
+p_hat1
+```
+
+In this sample, `r round(p_hat1 * 20)` of the 20 people think the work
+scientists do enhances their lives, so the sample proportion is
+p-hat = `r p_hat1`.
+
+**Point estimate:** the point estimate of the population proportion of
+people who think the work scientists do enhances their lives is
+p-hat = `r p_hat1` (90%). A different student's sample would generally
+give a different point estimate -- with only 20 people, sample
+proportions are quite variable.
+
+## Task 2: 2000 samples of size 20
+
+```{r task-2}
+sample_props20 <- sample_props(global_monitor, "scientist_work", "Benefits",
+  size = 20, reps = 2000, seed = 42
+)
+hist(sample_props20,
+  breaks = seq(0.35, 1.05, by = 0.05),
+  col = "grey85",
+  main = "Sampling distribution of p-hat, n = 20",
+  xlab = "Sample proportion (p-hat)"
+)
+summary(sample_props20)
+```
+
+The distribution is centred near the true proportion (mean =
+`r round(mean(sample_props20), 4)`), but it is not symmetric: the
+smallest p-hat is `r min(sample_props20)` while the largest is
+`r max(sample_props20)`, and `r round(100 * mean(sample_props20 == 1), 1)`%
+of samples hit the ceiling of exactly 1. The left tail stretches far
+below the centre (first quartile = `r quantile(sample_props20, 0.25)`)
+while only a thin sliver sits above 0.9. Because the true proportion is
+high (0.80) and the samples are small, the right side is truncated at 1
+and a long left tail develops.
+
+**Answer: Yes, the data are left skewed.**
+
+## Task 3: 2000 samples of size 200
+
+```{r task-3}
+sample_props200 <- sample_props(global_monitor, "scientist_work", "Benefits",
+  size = 200, reps = 2000, seed = 42
+)
+hist(sample_props200,
+  breaks = seq(0.65, 0.95, by = 0.01),
+  col = "grey85",
+  main = "Sampling distribution of p-hat, n = 200",
+  xlab = "Sample proportion (p-hat)"
+)
+c(mean = mean(sample_props200), sd = sd(sample_props200))
+```
+
+With n = 200 the distribution is centred on the true proportion again
+(mean = `r round(mean(sample_props200), 4)`) but this time it is roughly
+symmetric with no visible ceiling effect, since typical samples sit far
+from 1.
+
+**What value would you use to estimate the true population proportion?**
+
+**Answer: The mean of the sample proportions.** The mean of the 2000
+proportions is `r round(mean(sample_props200), 4)`, essentially the
+known truth of 0.80: the mean of a sampling distribution of p-hat equals
+the population proportion it estimates.
+
+**Which sampling distribution has a smaller spread?**
+
+**Answer: The sampling distribution from Q3** (n = 200). Its standard
+deviation is `r round(sd(sample_props200), 4)` versus
+`r round(sd(sample_props20), 4)` for n = 20 -- larger samples produce
+sample proportions that cluster more tightly around the truth, in line
+with sqrt(p * (1 - p) / n).
+
+# Confidence intervals
+
+The Wald interval for a proportion is p-hat +/- z* x
+sqrt(p-hat * (1 - p-hat) / n), where z* is the critical value carrying
+the confidence level in the middle of the standard normal curve.
+
+**For a confidence level of 90%, what is the appropriate critical value?**
+
+```{r critical-value}
+z_star <- stats::qnorm(0.95)
+z_star
+```
+
+**Answer: z* = 1.64** (to 2 decimal places; `r round(z_star, 4)`
+unrounded). The remaining 10% error probability splits evenly across
+the two tails, so the critical value is the normal distribution's
+0.95 quantile.
+
+## Task 4: a 90% confidence interval from a sample of size 60
+
+```{r task-4}
+p_hat4 <- sample_props(us_adults, "climate_change_affects", "Yes",
+  size = 60, reps = 1, seed = 312
+)
+p_hat4
+
+ci90 <- prop_ci(p_hat4, size = 60, conf_level = 0.90)
+ci90
+```
+
+The sample proportion is p-hat = `r round(p_hat4, 4)` (of the 60 adults
+sampled, `r round(p_hat4 * 60)` think climate change is affecting their
+local community), and the 90% confidence interval runs from
+`r round(ci90$lower, 4)` to `r round(ci90$upper, 4)`.
+
+**Interpretation:** we are 90% confident that the true proportion of US
+adults who think climate change is affecting their local community is
+between `r round(ci90$lower, 4)` and `r round(ci90$upper, 4)`. This
+particular interval does capture the known population truth of 0.62 --
+each new sample gives its own interval, and about 90% of those
+intervals will contain the true proportion.
+
+**Is this interval narrower or wider than the earlier 95% confidence
+interval?**
+
+```{r compare-cis}
+ci95 <- prop_ci(p_hat4, size = 60, conf_level = 0.95)
+ci95
+rbind(
+  width_90 = c(
+    lower = ci90$lower, upper = ci90$upper,
+    width = ci90$upper - ci90$lower
+  ),
+  width_95 = c(
+    lower = ci95$lower, upper = ci95$upper,
+    width = ci95$upper - ci95$lower
+  )
+)
+```
+
+**Answer: narrower.** The same sample gives a 95% interval of width
+`r round(ci95$upper - ci95$lower, 4)` but a 90% interval of width only
+`r round(ci90$upper - ci90$lower, 4)`: lowering the confidence level
+shrinks the critical value from `r round(ci95$critical_value, 2)` to
+`r round(ci90$critical_value, 2)`, so the interval tightens. That is
+the confidence-precision trade-off -- to be more confident, the
+interval must be wider.

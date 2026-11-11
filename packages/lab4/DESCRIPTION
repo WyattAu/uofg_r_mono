@@ -1,0 +1,27 @@
+Package: lab4
+Type: Package
+Title: Lab 4: Sampling Distributions and Confidence Intervals
+Version: 0.1.0
+Authors@R: person("Wyatt", "Au", , "wyatt_au@protonmail.com", role = c("aut", "cre"))
+Description: The Lab 4 group tasks as a reproducible package. Ships the
+    two synthetic survey populations used in the lab (global_monitor,
+    us_adults), a deterministic sampling-distribution simulator
+    (sample_props()), a Wald confidence-interval helper (prop_ci()),
+    and a vignette that works through every task with its answers.
+License: Apache License (>= 2.0)
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+LazyData: true
+Imports:
+    checkmate,
+    stats,
+    withr
+Suggests:
+    knitr,
+    rmarkdown,
+    testthat (>= 3.0.0)
+VignetteBuilder: knitr
+Config/testthat/edition: 3
+URL: https://github.com/WyattAu/uofg_r_mono
+BugReports: https://github.com/WyattAu/uofg_r_mono/issues
+Config/roxygen2/version: 8.1.0
