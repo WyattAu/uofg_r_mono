@@ -2,3 +2,4 @@
 ^\.Rproj\.user$
 ^\.Rprofile$
 ^data-raw$
+^vignettes/\.Rprofile$
