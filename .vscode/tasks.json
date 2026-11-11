@@ -21,6 +21,13 @@
       "command": "Rscript scripts/coverage.R",
       "group": "test",
       "problemMatcher": []
+    },
+    {
+      "label": "render: lab4 vignette",
+      "type": "shell",
+      "command": "Rscript -e 'rmarkdown::render(\"packages/lab4/vignettes/lab4.Rmd\")'",
+      "group": "build",
+      "problemMatcher": []
     }
   ]
 }
